@@ -12,7 +12,7 @@ func InitConfig() error {
 	}
 
 	viper.SetConfigFile("config/config.yml")
-	err = viper.ReadInConfig()
+	err = viper.MergeInConfig()
 
 	return err
 }
