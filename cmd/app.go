@@ -4,6 +4,7 @@ import (
 	"AuthService/config"
 	"AuthService/internal/repository"
 	lg "AuthService/pkg/logger"
+	"fmt"
 	"github.com/spf13/viper"
 )
 
@@ -19,7 +20,7 @@ func main() {
 	logger.Info.Println("SERVER PORT: " + viper.GetString("port"))
 
 	logger.Info.Println("Connecting to MongoDB.")
-	_, err := repository.NewMongoClient("mongodb",
+	client, err := repository.NewMongoClient("mongodb",
 		viper.GetString("MONGO_HOST"),
 		viper.GetString("MONGO_PORT"),
 		viper.GetString("MONGO_INITDB_ROOT_USERNAME"),
@@ -29,4 +30,8 @@ func main() {
 		logger.Err.Fatalf(err.Error())
 	}
 
+	logger.Info.Println(fmt.Sprintf("Created collection '%s' in database '%s'", repository.CollectionName, repository.DatabaseName))
+	if err := repository.CreateCollections(client); err != nil {
+		logger.Err.Fatalf(err.Error())
+	}
 }
