@@ -21,12 +21,6 @@ func NewMongoClient(dbname, host, port, user, password string) (*mongo.Client, e
 		panic(err)
 	}
 
-	//defer func() {
-	//	if err := client.Disconnect(context.TODO()); err != nil {
-	//		panic(err)
-	//	}
-	//}()
-
 	return client, nil
 }
 
@@ -46,10 +40,6 @@ func CreateCollections(client *mongo.Client) error {
 			ExpireAfterSeconds: &sec, // 604800 sec = 7 days * 24h * 60 min * 60sec
 		},
 	}
-
-	//index := bson.D{{"ttl", bson.D{{"created_at", -1}}}, {"ExpireAfterSeconds", sec}}
-
-	//opts := options.CreateCollection().SetClusteredIndex(index)
 
 	_, err = client.Database(DatabaseName).Collection(CollectionName).Indexes().CreateOne(context.TODO(), indexModel)
 
