@@ -10,7 +10,7 @@ import (
 
 const DatabaseName = "Auth"
 const CollectionName = "Refresh"
-const expireAfterSeconds int32 = 604800
+const ExpireAfterSeconds int32 = 604800
 
 func NewMongoClient(dbname, host, port, user, password string) (*mongo.Client, error) {
 
@@ -37,7 +37,7 @@ func CreateCollections(client *mongo.Client) error {
 		return err
 	}
 
-	var sec = expireAfterSeconds
+	var sec = ExpireAfterSeconds
 	indexModel := mongo.IndexModel{
 		Keys: bson.D{
 			{"created_time", 1},
@@ -47,7 +47,7 @@ func CreateCollections(client *mongo.Client) error {
 		},
 	}
 
-	//index := bson.D{{"ttl", bson.D{{"created_at", -1}}}, {"expireAfterSeconds", sec}}
+	//index := bson.D{{"ttl", bson.D{{"created_at", -1}}}, {"ExpireAfterSeconds", sec}}
 
 	//opts := options.CreateCollection().SetClusteredIndex(index)
 
