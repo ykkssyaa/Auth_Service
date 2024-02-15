@@ -11,6 +11,6 @@ type Services struct {
 
 func NewServices(repository *repository.Repository, logger *logger.Logger) *Services {
 	return &Services{
-		AuthService: AuthServiceImpl{logger: logger, repo: repository},
+		AuthService: AuthServiceImpl{logger: logger, repo: repository.AuthRepository},
 	}
 }
