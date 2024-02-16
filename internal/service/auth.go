@@ -7,6 +7,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
+	"time"
 )
 
 type AuthService interface {
@@ -29,6 +30,7 @@ func (a AuthServiceImpl) GenerateTokens(guid string) (model.Tokens, error) {
 	refreshToken := generateRefreshHash(guid)
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(refreshToken), 10)
+
 	if err != nil {
 		return model.Tokens{}, err
 	}
@@ -38,12 +40,21 @@ func (a AuthServiceImpl) GenerateTokens(guid string) (model.Tokens, error) {
 	return model.Tokens{
 		Access:  accessToken,
 		Refresh: refreshToken,
-	}, nil
+	}, err
 }
 
-func generateRefreshHash(token string) string {
+func generateRefreshHash(str string) string {
 	hash := sha256.New()
-	hash.Write([]byte(token))
+	hash.Write([]byte(str))
 
-	return fmt.Sprintf("%x", hash.Sum([]byte(nil)))
+	time.Sleep(1 * time.Millisecond)
+	hash.Write([]byte(time.Now().String()))
+
+	token := fmt.Sprintf("%x", hash.Sum(nil))
+
+	return token[len(token)-30:]
+}
+
+func (a AuthServiceImpl) RefreshTokens(refreshToken, guid string) (model.Tokens, error) {
+	return model.Tokens{}, nil
 }
