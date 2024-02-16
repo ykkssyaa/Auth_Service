@@ -8,8 +8,6 @@ services:
     depends_on:
       - mongodb
 
-
-
   mongodb:
     container_name: mongodb_auth
     image: mongodb/mongodb-community-server:latest
@@ -18,7 +16,3 @@ services:
       - MONGODB_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
     ports:
       - ${MONGO_PORT}:${MONGO_PORT}
-    volumes:
-      - type: bind
-        source: ./data
-        target: /data/db
