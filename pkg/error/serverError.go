@@ -20,14 +20,14 @@ func (re ResponseError) GetCode() Status {
 	return re.Code
 }
 
-func HttpResponseError(w http.ResponseWriter, message string, httpStatusCode int) {
+func HttpResponseError(w http.ResponseWriter, responseError ResponseError) {
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(httpStatusCode)
+	w.WriteHeader(int(responseError.GetCode()))
 
 	resp := make(map[string]string)
 
-	resp["message"] = message
+	resp["message"] = responseError.Error()
 	jsonResp, _ := json.Marshal(resp)
 	_, _ = w.Write(jsonResp)
 }

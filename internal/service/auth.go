@@ -1,13 +1,15 @@
 package service
 
 import (
+	"AuthService/internal/consts"
 	"AuthService/internal/model"
 	"AuthService/internal/repository"
+	se "AuthService/pkg/error"
 	"AuthService/pkg/logger"
 	"crypto/sha256"
-	"errors"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
+	"net/http"
 	"time"
 )
 
@@ -23,10 +25,10 @@ type AuthServiceImpl struct {
 
 func (a AuthServiceImpl) GenerateTokens(guid string) (model.Tokens, error) {
 
-	accessToken, err := model.GenerateToken(guid, model.AccessTokenTTL)
+	accessToken, err := model.GenerateToken(guid, consts.AccessTokenTTL)
 
 	if err != nil {
-		return model.Tokens{}, err
+		return model.Tokens{}, &se.ResponseError{Message: consts.ErrGenToken, Code: http.StatusInternalServerError}
 	}
 
 	refreshToken := generateRefreshHash(guid)
@@ -34,15 +36,19 @@ func (a AuthServiceImpl) GenerateTokens(guid string) (model.Tokens, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(refreshToken), 10)
 
 	if err != nil {
-		return model.Tokens{}, err
+		return model.Tokens{}, &se.ResponseError{Message: consts.ErrBcrypt, Code: http.StatusInternalServerError}
 	}
 
 	err = a.repo.SaveToken(guid, string(hash))
 
+	if err != nil {
+		return model.Tokens{}, err
+	}
+
 	return model.Tokens{
 		Access:  accessToken,
 		Refresh: refreshToken,
-	}, err
+	}, nil
 }
 
 func generateRefreshHash(str string) string {
@@ -66,7 +72,7 @@ func (a AuthServiceImpl) RefreshTokens(refreshToken, guid string) (model.Tokens,
 	doc := findToken(res, refreshToken)
 
 	if len(doc.Token) == 0 {
-		return model.Tokens{}, errors.New("error: token is invalid")
+		return model.Tokens{}, &se.ResponseError{Message: consts.ErrInvalidToken, Code: http.StatusBadRequest}
 	}
 
 	if err := a.repo.DeleteToken(doc.ID); err != nil {

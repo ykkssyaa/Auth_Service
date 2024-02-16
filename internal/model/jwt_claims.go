@@ -6,10 +6,6 @@ import (
 	"time"
 )
 
-const ExpireAfterSeconds int32 = 604800
-const RefreshTokenTTL = time.Duration(ExpireAfterSeconds) * time.Second // 1 week
-const AccessTokenTTL = 2 * time.Hour
-
 type TokenClaims struct {
 	jwt.RegisteredClaims
 	UserId string `json:"user_id"`

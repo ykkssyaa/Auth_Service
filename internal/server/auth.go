@@ -1,22 +1,29 @@
 package server
 
 import (
-	server_error "AuthService/pkg/error"
+	se "AuthService/pkg/error"
 	"encoding/json"
+	"errors"
 	"net/http"
 )
 
 func (s *HttpServer) GetTokens(w http.ResponseWriter, r *http.Request) {
 
-	s.logger.Info.Println("Invoked GetTokens on server")
-
 	id := r.URL.Query().Get("id")
+
+	s.logger.Info.Println("Invoked GetTokens on server. id = ", id)
 
 	tokens, err := s.services.AuthService.GenerateTokens(id)
 
 	if err != nil {
 		s.logger.Err.Println(err.Error())
-		server_error.HttpResponseError(w, err.Error(), http.StatusInternalServerError)
+		var rErr *se.ResponseError
+		if errors.As(err, &rErr) {
+			se.HttpResponseError(w, *rErr)
+		} else {
+			se.HttpResponseError(w, se.ResponseError{Message: err.Error(), Code: http.StatusInternalServerError})
+		}
+
 		return
 	}
 
@@ -26,15 +33,23 @@ func (s *HttpServer) GetTokens(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *HttpServer) RefreshTokens(w http.ResponseWriter, r *http.Request) {
-	s.logger.Info.Println("Invoked RefreshTokens on server")
 
 	refresh := r.URL.Query().Get("token")
 	id := r.Header.Get("id")
 
+	s.logger.Info.Println("Invoked RefreshTokens on server. token = ", refresh)
+
 	tokens, err := s.services.AuthService.RefreshTokens(refresh, id)
+
 	if err != nil {
 		s.logger.Err.Println(err.Error())
-		server_error.HttpResponseError(w, err.Error(), http.StatusInternalServerError)
+		var rErr *se.ResponseError
+		if errors.As(err, &rErr) {
+			se.HttpResponseError(w, *rErr)
+		} else {
+			se.HttpResponseError(w, se.ResponseError{Message: err.Error(), Code: http.StatusInternalServerError})
+		}
+
 		return
 	}
 
