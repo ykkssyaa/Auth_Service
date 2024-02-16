@@ -16,7 +16,7 @@ func (s *HttpServer) GetTokens(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		s.logger.Err.Println(err.Error())
-		server_error.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		server_error.HttpResponseError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -34,7 +34,7 @@ func (s *HttpServer) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 	tokens, err := s.services.AuthService.RefreshTokens(refresh, id)
 	if err != nil {
 		s.logger.Err.Println(err.Error())
-		server_error.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		server_error.HttpResponseError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
