@@ -1,13 +1,13 @@
 package model
 
 import (
-	"AuthService/internal/repository"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/spf13/viper"
 	"time"
 )
 
-const RefreshTokenTTL = time.Duration(repository.ExpireAfterSeconds) * time.Second // 1 week
+const ExpireAfterSeconds int32 = 604800
+const RefreshTokenTTL = time.Duration(ExpireAfterSeconds) * time.Second // 1 week
 const AccessTokenTTL = 2 * time.Hour
 
 type TokenClaims struct {

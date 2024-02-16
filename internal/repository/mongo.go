@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"AuthService/internal/model"
 	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
@@ -10,7 +11,6 @@ import (
 
 const DatabaseName = "Auth"
 const CollectionName = "Refresh"
-const ExpireAfterSeconds int32 = 604800
 
 func NewMongoClient(dbname, host, port, user, password string) (*mongo.Client, error) {
 
@@ -31,7 +31,7 @@ func CreateCollections(client *mongo.Client) error {
 		return err
 	}
 
-	var sec = ExpireAfterSeconds
+	var sec = model.ExpireAfterSeconds
 	indexModel := mongo.IndexModel{
 		Keys: bson.D{
 			{"created_time", 1},

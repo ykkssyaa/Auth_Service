@@ -28,6 +28,17 @@ func (s *HttpServer) GetTokens(w http.ResponseWriter, r *http.Request) {
 func (s *HttpServer) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 	s.logger.Info.Println("Invoked RefreshTokens on server")
 
+	refresh := r.URL.Query().Get("token")
+	id := r.Header.Get("id")
+
+	tokens, err := s.services.AuthService.RefreshTokens(refresh, id)
+	if err != nil {
+		s.logger.Err.Println(err.Error())
+		server_error.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusNotImplemented)
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(tokens)
 }
